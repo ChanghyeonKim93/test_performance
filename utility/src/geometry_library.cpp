@@ -33,6 +33,11 @@ namespace geometry
         if(val4 > eta) q(3) = 0.5*sqrt(1+val4);
         else q(3) = 0.5*sqrt(( (r21-r12)*(r21-r12) + (r31+r13)*(r31+r13) + (r32+r23)*(r32+r23) )/(3.0-val4));
        
+        q(0) = abs(q(0));
+        q(1) *= ((r32-r23 > 0) - (r32-r23 < 0));
+        q(2) *= ((r13-r31 > 0) - (r13-r31 < 0));
+        q(3) *= ((r21-r12 > 0) - (r21-r12 < 0));
+
         return q;  
     };
     
@@ -80,9 +85,9 @@ namespace geometry
         double cc = c*cs, cd = c*ds, dd = d*ds;
         
         Rot3 R;
-        R << 1-cc-dd, bc-ad, bd+ac, 
-             bc+ad, 1-bb-dd, cd-ab,
-             bd-ac, cd+ab, 1-bb-cc;
+        R << 1.0-cc-dd, bc-ad, bd+ac, 
+             bc+ad, 1.0-bb-dd, cd-ab,
+             bd-ac, cd+ab, 1.0-bb-cc;
         
         return R;
     };
@@ -90,15 +95,27 @@ namespace geometry
     Vec4 q1_mul_q2(const Vec4& q1, const Vec4& q2)
     {
         Vec4 q_res;
+        
+        double a1 = q1(0), b1 = q1(1), c1 = q1(2), d1 = q1(3);
+        double a2 = q2(0), b2 = q2(1), c2 = q2(2), d2 = q2(3);
+
+        q_res(0) = a1*a2-b1*b2-c1*c2-d1*d2;
+        q_res(1) = a1*b2+b1*a2+c1*d2-d1*c2;
+        q_res(2) = a1*c2-b1*d2+c1*a2+d1*b2;
+        q_res(3) = a1*d2+b1*c2-c1*b2+d1*a2;
+
+        // q_res.normalize();
+        // std::cout <<" norm: " << q_res.norm() << std::endl;        
+
         return q_res;
     };
 
     Rot3 a2r(NumericType roll, NumericType pitch, NumericType yaw)
     {
         Rot3 R;
-        NumericType cr = cos(roll), sr = sin(roll);
+        NumericType cr = cos(roll),  sr = sin(roll);
         NumericType cp = cos(pitch), sp = sin(pitch);
-        NumericType cy = cos(yaw), sy = sin(yaw);
+        NumericType cy = cos(yaw),   sy = sin(yaw);
 
         Rot3 Rr, Rp, Ry;
         Rr << cr,sr,0,-sr,cr,0,0,0,1;

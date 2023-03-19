@@ -4,7 +4,7 @@
 #include <iostream>
 #include "eigen3/Eigen/Dense"
 
-using NumericType = double;
+using NumericType = float;
 using Rot3 = Eigen::Matrix<NumericType,3,3>;
 using Vec3 = Eigen::Matrix<NumericType,3,1>;
 using Vec4 = Eigen::Matrix<NumericType,4,1>;
