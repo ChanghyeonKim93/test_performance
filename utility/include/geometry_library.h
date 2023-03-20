@@ -19,6 +19,7 @@ namespace geometry
     Rot3 euler2rot(const Vec3& rpy);
 
     Rot3 axisangle2rot(const Vec3& axis, NumericType angle);
+    Vec4 axisangle2quat(const Vec3& axis, NumericType angle);
 
 };
 

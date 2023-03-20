@@ -170,4 +170,44 @@ namespace geometry
 
         return R;
     };
+
+    Rot3 axisangle2rot(const Vec3& axis, NumericType angle)
+    {
+        double axisnorm_inv = 1.0/axis.norm();
+
+        Eigen::Matrix<double,3,3> K;
+        K << 0.0, -axis(2)*axisnorm_inv, axis(1)*axisnorm_inv, axis(2)*axisnorm_inv,0.0,0.0,0.0,0.0,0.0;
+        K(1,0) = -K(0,1);
+        K(2,0) = -K(0,2);
+        K(2,1) = -K(1,2);
+
+        Eigen::Matrix<double,3,3> K2;
+        K2 = K*K;
+
+        Eigen::Matrix<double,3,3> R_tmp;
+        R_tmp.setIdentity();
+        R_tmp.noalias() += sin((double)angle)*K + (1.0-cos((double)angle))*K2;
+
+        Rot3 R = R_tmp.cast<float>();
+        
+        return R;
+    };
+
+    Vec4 axisangle2quat(const Vec3& axis, NumericType angle)
+    {
+        double qw = cos(0.5*(double)angle);
+        double s = sin(0.5*(double)angle);
+        
+        double axisnorm_inv = 1.0/axis.norm();
+
+        Vec4 q;
+        q(0) = qw;
+        q(1) = axis(0)*s*axisnorm_inv;
+        q(2) = axis(1)*s*axisnorm_inv;
+        q(3) = axis(2)*s*axisnorm_inv;
+
+        q.normalize();
+
+        return q;
+    };
 };
