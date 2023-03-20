@@ -12,10 +12,10 @@ int main()
     double angle_step = 0.03;
 
     Rot3 R1(Rot3::Identity());
-    Rot3 dR = geometry::a2r(angle_step, 0.0, 0.0);
+    Rot3 dR = geometry::euler2rot(angle_step, 0.0, 0.0);
     
     Rot3 R_true(Rot3::Identity());
-    R_true = geometry::a2r(angle_step*(double)num_accum,0,0);
+    R_true = geometry::euler2rot(angle_step*(double)num_accum,0,0);
 
     // Result 1) rotation multiplication
     for(int iter = 0; iter < num_accum  ; ++iter)
@@ -28,12 +28,12 @@ int main()
 
     // Result 2) quaternion multiplication
     Rot3 R2(Rot3::Identity());
-    Vec4 q2 = geometry::r2q(R2);
-    Vec4 dq = geometry::r2q(dR);
+    Vec4 q2 = geometry::rot2quat(R2);
+    Vec4 dq = geometry::rot2quat(dR);
     for(int iter = 0; iter < num_accum; ++iter)
-        q2 = geometry::q1_mul_q2(q2,dq);
+        q2 = geometry::quat1_mul_quat2(q2,dq);
 
-    R2 = geometry::q2r(q2);
+    R2 = geometry::quat2rot(q2);
 
     std::cout << "Det 2 : " << R2.determinant();
     Rot3 delta_R2 = R_true.transpose()*R2;
@@ -44,7 +44,7 @@ int main()
     for(int iter = 0; iter < num_accum  ; ++iter)
         R3 = R3*dR;
 
-    R3 = geometry::q2r(geometry::r2q(R3)); // conversion
+    R3 = geometry::quat2rot(geometry::rot2quat(R3)); // conversion
     std::cout << "Det 3 : " << R3.determinant();
     Rot3 delta_R3 = R_true.transpose()*R3;
     std::cout << ", Error : " << abs(acos(delta_R3(0,0))) << std::endl;
